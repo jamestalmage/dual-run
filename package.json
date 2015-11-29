@@ -30,7 +30,7 @@
     "pinkie": "^2.0.1"
   },
   "devDependencies": {
-    "ava": "github:sindresorhus/ava",
+    "ava": "git+https://github.com/sindresorhus/ava.git",
     "chalk": "^1.1.1",
     "get-stream": "^1.1.0",
     "xo": "^0.10.0"

@@ -6,6 +6,19 @@ var getStream = require('get-stream');
 var stream = require('stream');
 var chalk = require('chalk');
 
+var hasPty = true;
+
+try {
+	require('child_pty');
+} catch (e) {
+	hasPty = false;
+}
+
+// https://github.com/Gottox/child_pty/issues/12
+var sep = hasPty ? '\r\n' : '\n';
+
+chalk.enabled = chalk.enabled && hasPty;
+
 test.beforeEach(t => {
 	t.context.a = new stream.PassThrough();
 	t.context.b = new stream.PassThrough();
@@ -31,8 +44,8 @@ test('two at a time', async t => {
 		stdout,
 		[
 			'hello\n',
-			chalk.green('goodbye'), '\r\n',
-			chalk.blue('done'), '\r\n'
+			chalk.green('goodbye'), sep,
+			chalk.blue('done'), sep
 		].join('')
 	);
 });
@@ -56,9 +69,9 @@ test('three at a time', async t => {
 		stdout,
 		[
 			'hello\n',
-			chalk.green('goodbye'), '\r\n',
-			chalk.blue('done'), '\r\n',
-			chalk.yellow('foo'), '\r\n'
+			chalk.green('goodbye'), sep,
+			chalk.blue('done'), sep,
+			chalk.yellow('foo'), sep
 		].join('')
 	);
 });
