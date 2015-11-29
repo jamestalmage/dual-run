@@ -1,10 +1,12 @@
 'use strict';
 var test = require('ava');
-
-var api = require('../');
-var getStream = require('get-stream');
 var stream = require('stream');
 var chalk = require('chalk');
+var api = require('../');
+
+// getStream needs a Promise ponyfill.
+global.Promise = global.Promise || Promise;
+var getStream = require('get-stream');
 
 var hasPty = true;
 
