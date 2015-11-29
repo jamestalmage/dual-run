@@ -9,20 +9,30 @@ try {
 	pty = require('child_pty');
 } catch (e) {}
 
-module.exports = function (commands, stdout, stderr) {
-	function opts(command) {
+module.exports = function (commands, opts) {
+	opts = opts || {};
+
+	function makeOpts(command) {
 		return {
 			command: command.command,
 			args: command.args || [],
-			stdout: stdout || process.stdout,
-			stderr: stderr || process.stderr
+			stdout: opts.stdout || process.stdout,
+			stderr: opts.stderr || process.stderr
 		};
 	}
 
-	var last = simpleSpawn(opts(commands[0]));
+	var fn = serialSpawn;
 
-	for (var i = 1; i < commands.length; i++) {
-		last = ptySpawn(opts(commands[i]), last);
+	if (opts.noColor) {
+		fn = cpSpawn;
+	} else if (pty) {
+		fn = ptySpawn;
+	}
+
+	var last = Promise.resolve();
+
+	for (var i = 0; i < commands.length; i++) {
+		last = fn(makeOpts(commands[i]), last);
 	}
 
 	return last;
@@ -65,29 +75,42 @@ function handleExit(opts, code, resolve, reject) {
 	reject(err);
 }
 
-function ptySpawn(opts, previous) {
-	if (!pty) {
-		return previous.then(function () {
-			return simpleSpawn(opts);
-		});
-	}
+function serialSpawn(opts, previous) {
+	return previous.then(function () {
+		return simpleSpawn(opts);
+	});
+}
 
+function ptySpawn(opts, previous) {
+	return bufferedSpawn(pty, 'pty', true, opts, previous);
+}
+
+function cpSpawn(opts, previous) {
+	return bufferedSpawn(child, 'pipe', false, opts, previous);
+}
+
+function bufferedSpawn(pty, pipeArg, resizeEvents, opts, previous) {
 	var promise = new Promise(function (resolve, reject) {
 		var stdoutBuffer = new stream.PassThrough();
 		var stderrBuffer = new stream.PassThrough();
 
-		var ps2 = pty.spawn(opts.command, opts.args, {
-			stdio: [null, 'pty', 'pty'],
-			columns: process.stdout.columns,
-			rows: process.stdout.rows
-		});
+		var spawnArgs = {stdio: [null, pipeArg, pipeArg]};
 
-		process.stdout.on('resize', function () {
-			ps2.stdout.resize({
-				columns: process.stdout.columns,
-				rows: process.stdout.rows
+		if (resizeEvents) {
+			spawnArgs.columns = process.stdout.columns;
+			spawnArgs.rows = process.stdout.rows;
+		}
+
+		var ps2 = pty.spawn(opts.command, opts.args, spawnArgs);
+
+		if (resizeEvents) {
+			process.stdout.on('resize', function () {
+				ps2.stdout.resize({
+					columns: process.stdout.columns,
+					rows: process.stdout.rows
+				});
 			});
-		});
+		}
 
 		ps2.stdout.on('data', function (data) {
 			stdoutBuffer.write(data);

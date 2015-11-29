@@ -35,7 +35,7 @@ test('two at a time', async t => {
 	await api([
 		{command: './fixtures/hello.js'},
 		{command: './fixtures/goodbye.js'}
-	], a, b);
+	], {stdout: a, stderr: b});
 
 	a.end();
 	b.end();
@@ -45,7 +45,7 @@ test('two at a time', async t => {
 	t.is(
 		stdout,
 		[
-			'hello\n',
+			chalk.red('hello'), sep,
 			chalk.green('goodbye'), sep,
 			chalk.blue('done'), sep
 		].join('')
@@ -60,7 +60,7 @@ test('three at a time', async t => {
 		{command: './fixtures/hello.js'},
 		{command: './fixtures/goodbye.js'},
 		{command: './fixtures/foo.js'}
-	], a, b);
+	], {stdout: a, stderr: b});
 
 	a.end();
 	b.end();
@@ -70,10 +70,37 @@ test('three at a time', async t => {
 	t.is(
 		stdout,
 		[
-			'hello\n',
+			chalk.red('hello'), sep,
 			chalk.green('goodbye'), sep,
 			chalk.blue('done'), sep,
 			chalk.yellow('foo'), sep
 		].join('')
 	);
 });
+
+test('three at a time (no Color)', async t => {
+	t.plan(1);
+
+	const {a, b} = t.context;
+	await api([
+		{command: './fixtures/hello.js'},
+		{command: './fixtures/goodbye.js'},
+		{command: './fixtures/foo.js'}
+	], {stdout: a, stderr: b, noColor: true});
+
+	a.end();
+	b.end();
+
+	var stdout = await getStream(a);
+
+	t.is(
+		stdout,
+		[
+			'hello',
+			'goodbye',
+			'done',
+			'foo\n'
+		].join('\n')
+	);
+});
+
