@@ -1,57 +1,42 @@
 #!/usr/bin/env node
 'use strict';
-var child = require('child_process');
-var stream = require('stream');
-var supportsColor = require('supports-color');
-var xtend = require('xtend');
+
+var api = require('./index.js');
 
 var args = process.argv.slice(2);
+var commands = [];
+var i = 0;
 
-var idx = args.indexOf('----');
-
-if (idx === -1) {
-	throw new Error('no `----` argument found');
+while (i < args.length) {
+	var commandArgs = nextCmd(i);
+	i += commandArgs.length + 1;
+	commands.push({
+		command: cmd(commandArgs),
+		args: commandArgs
+	});
 }
 
-var firstArgs = args.slice(0, idx);
-var firstCmd = cmd(firstArgs, 'before');
-var secondArgs = args.slice(idx + 1);
-var secondCmd = cmd(secondArgs, 'after');
+if (commands.length < 2) {
+	throw new Error('no ---- separator argument found');
+}
 
-var stdoutBuffer = new stream.PassThrough();
-var stderrBuffer = new stream.PassThrough();
-
-child
-	.spawn(firstCmd, firstArgs, {
-		stdio: 'inherit'
+api(commands)
+	.then(function () {
+		process.exit(0);
 	})
-	.on('close', function (code) {
-		if (code !== 0) {
-			process.exit(code);
-			return;
-		}
-
-		stdoutBuffer.pipe(process.stdout);
-		stderrBuffer.pipe(process.stderr);
+	.catch(function (e) {
+		console.warn(e.stack || e.message || e);
+		process.exit(e.code || 1);
 	});
 
-var env = xtend(process.env);
-
-if (supportsColor) {
-	env.FORCE_COLOR = 'true';
+function nextCmd(from) {
+	var to = args.indexOf('----', from);
+	return to === -1 ? args.slice(from) : args.slice(from, to);
 }
 
-var ps2 = child.spawn(secondCmd, secondArgs, {
-	stdio: [null, 'pipe', 'pipe'],
-	env: env
-});
-
-ps2.stdout.pipe(stdoutBuffer);
-ps2.stderr.pipe(stderrBuffer);
-
-function cmd(args, description) {
+function cmd(args) {
 	if (args.length < 1) {
-		throw new Error('no arguments ' + description + ' "----"');
+		throw new Error('no command found before/after/between ---- separator arguments');
 	}
 	return args.shift();
 }

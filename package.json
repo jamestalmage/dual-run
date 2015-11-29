@@ -27,18 +27,20 @@
     ""
   ],
   "dependencies": {
-    "meow": "^3.4.2",
-    "supports-color": "^3.1.2",
-    "xtend": "^4.0.1"
+    "pinkie": "^2.0.1"
   },
   "devDependencies": {
-    "ava": "^0.3.0",
+    "ava": "github:sindresorhus/ava",
     "chalk": "^1.1.1",
+    "get-stream": "^1.1.0",
     "xo": "^0.10.0"
+  },
+  "optionalDependencies": {
+    "child_pty": "^3.0.0"
   },
   "xo": {
     "ignores": [
-      "test.js"
+      "test/**"
     ]
   }
 }
