@@ -1,0 +1,44 @@
+{
+  "name": "dual-run",
+  "version": "0.0.0",
+  "description": "My outstanding module",
+  "license": "MIT",
+  "repository": "jamestalmage/dual-run",
+  "author": {
+    "name": "James Talmage",
+    "email": "james@talmage.io",
+    "url": "github.com/jamestalmage"
+  },
+  "bin": "cli.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "xo && ava",
+    "foo": "which ava"
+  },
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
+  "keywords": [
+    "cli-app",
+    "cli",
+    ""
+  ],
+  "dependencies": {
+    "meow": "^3.4.2",
+    "supports-color": "^3.1.2",
+    "xtend": "^4.0.1"
+  },
+  "devDependencies": {
+    "ava": "^0.3.0",
+    "chalk": "^1.1.1",
+    "xo": "^0.10.0"
+  },
+  "xo": {
+    "ignores": [
+      "test.js"
+    ]
+  }
+}
