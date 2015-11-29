@@ -1,7 +1,7 @@
 {
   "name": "dual-run",
   "version": "0.0.0",
-  "description": "My outstanding module",
+  "description": "Use bash style '&&' with concurrency.",
   "license": "MIT",
   "repository": "jamestalmage/dual-run",
   "author": {
