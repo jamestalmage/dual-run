@@ -1,6 +1,6 @@
 {
   "name": "dual-run",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Use bash style '&&' with concurrency.",
   "license": "MIT",
   "repository": "jamestalmage/dual-run",
