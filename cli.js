@@ -21,12 +21,11 @@ if (commands.length < 2) {
 }
 
 api(commands)
-	.then(function () {
-		process.exit(0);
-	})
 	.catch(function (e) {
 		console.warn(e.stack || e.message || e);
-		process.exit(e.code || 1);
+		setTimeout(function () {
+			process.exit(e.code || 1);
+		}, 200);
 	});
 
 function nextCmd(from) {
