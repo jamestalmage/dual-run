@@ -30,10 +30,10 @@
     "pinkie": "^2.0.1"
   },
   "devDependencies": {
-    "ava": "git+https://github.com/sindresorhus/ava.git",
+    "ava": "^0.14.0",
     "chalk": "^1.1.1",
-    "get-stream": "^1.1.0",
-    "xo": "^0.10.0"
+    "get-stream": "^2.0.0",
+    "xo": "^0.13.0"
   },
   "optionalDependencies": {
     "child_pty": "^3.0.0"
